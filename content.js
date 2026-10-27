@@ -1,5 +1,5 @@
 export const FILE_SLOTS={safety:'Паспорт безопасности',contract:'Договор',sgr:'СГР',draft:'Предварительный макет',final:'Итоговый макет',mockups_3d:'3д мокапы',product_photo:'Фото продукта',pack_photo:'Фото тары и крышки',pack_dieline:'Вырубка упаковки',carton_dieline:'Вырубка короба',other:'Дополнительные материалы'};
-export const MARKING_SECTIONS={package_marks:'Маркировка упаковки',carton_marks:'Маркировка короба',material_marks:'Материал упаковки'};
+export const MARKING_SECTIONS={package_marks:'Маркировка упаковки',carton_marks:'Маркировка короба'};
 export const MARKING_CATEGORIES=['Знаки соответствия','Манипуляционные знаки','Экологические знаки','Предупредительные знаки','Другие знаки','Материал упаковки'];
 export const IMPORTER_PREFIX='Разработано в Японии. Изготовлено с использованием японских материалов по заказу и под контролем ООО «Азия Лайф». Официальные импортеры и уполномоченные производителем организации в РФ и странах Таможенного союза:';
 export const IMPORTERS=[
@@ -27,11 +27,12 @@ const cleanString=(v,max=5000)=>{if(typeof v!=='string'||v.length>max)throw new 
 const idList=v=>{if(v===undefined)return [];if(!Array.isArray(v)||v.length>100)throw new Error('Слишком много выбранных значений');return [...new Set(v.map(x=>{if(typeof x!=='string'||!/^[a-zA-Z0-9_-]{1,100}$/.test(x))throw new Error('Некорректное выбранное значение');return x;}))];};
 export function normaliseDetails(v={}){
  if(!v||typeof v!=='object'||Array.isArray(v))throw new Error('Некорректная информация по товару');
- const out={factory_ids:idList(v.factory_ids),importer_ids:idList(v.importer_ids),package_marks:idList(v.package_marks),carton_marks:idList(v.carton_marks),material_marks:idList(v.material_marks),translations:{},competitors:[]};
+ const legacyMaterials=idList(v.material_marks),mergeMaterials=values=>[...new Set([...idList(values),...legacyMaterials])];
+ const out={factory_ids:idList(v.factory_ids),importer_ids:idList(v.importer_ids),package_marks:mergeMaterials(v.package_marks),carton_marks:mergeMaterials(v.carton_marks),translations:{},competitors:[]};
  if(out.importer_ids.some(id=>!IMPORTERS.some(x=>x.id===id)))throw new Error('Выберите импортера из списка');
  const translations=v.translations||{};if(typeof translations!=='object'||Array.isArray(translations))throw new Error('Некорректные переводы');
  for(const code of Object.keys(TRANSLATIONS)){const t=translations[code]||{};out.translations[code]={enabled:t.enabled===true,text:cleanString(t.text??'',30000)};}
- if(v.competitors!==undefined){if(!Array.isArray(v.competitors)||v.competitors.length>50)throw new Error('Не более 50 конкурентов в карточке');out.competitors=v.competitors.map((r,i)=>{if(!r||typeof r!=='object'||Array.isArray(r))throw new Error('Проверьте таблицу конкурентов');const id=cleanString(r.id||'row-'+i,100);if(!/^[a-zA-Z0-9_-]+$/.test(id))throw new Error('Некорректная строка конкурента');const row={id};for(const [k]of COMPETITOR_COLUMNS)row[k]=cleanString(r[k]??'',2000);if(row.url&&!/^https?:\/\/[^\s]+$/i.test(row.url))throw new Error('Ссылка на товар должна начинаться с https:// или http://');return row;});}
+ if(v.competitors!==undefined){if(!Array.isArray(v.competitors)||v.competitors.length>50)throw new Error('Не более 50 конкурентов в карточке');out.competitors=v.competitors.map((r,i)=>{if(!r||typeof r!=='object'||Array.isArray(r))throw new Error('Проверьте таблицу конкурентов');const id=cleanString(r.id||'row-'+i,100);if(!/^[a-zA-Z0-9_-]+$/.test(id))throw new Error('Некорректная строка конкурента');const row={id,photo_id:cleanString(r.photo_id??'',100)};if(row.photo_id&&!/^[a-zA-Z0-9_-]+$/.test(row.photo_id))throw new Error('Некорректное фото конкурента');for(const [k]of COMPETITOR_COLUMNS)row[k]=cleanString(r[k]??'',2000);if(row.url&&!/^https?:\/\/[^\s]+$/i.test(row.url))throw new Error('Ссылка на товар должна начинаться с https:// или http://');return row;});}
  return out;
 }
 export function importerText(ids=[]){const chosen=IMPORTERS.filter(x=>ids.includes(x.id));return [IMPORTER_PREFIX,...chosen.map(x=>x.text),...(chosen.length>1?[IMPORTER_NOTE]:[]),QUALITY_FOOTER,ASSORTMENT].join('\n\n');}
