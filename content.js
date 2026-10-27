@@ -1,4 +1,6 @@
-export const FILE_SLOTS={safety:'Паспорт безопасности',contract:'Договор',sgr:'СГР',draft:'Предварительный макет',final:'Итоговый макет',product_photo:'Фото продукта',pack_photo:'Фото тары и крышки',pack_dieline:'Вырубка упаковки',carton_dieline:'Вырубка короба',other:'Дополнительные материалы'};
+export const FILE_SLOTS={safety:'Паспорт безопасности',contract:'Договор',sgr:'СГР',draft:'Предварительный макет',final:'Итоговый макет',mockups_3d:'3д мокапы',product_photo:'Фото продукта',pack_photo:'Фото тары и крышки',pack_dieline:'Вырубка упаковки',carton_dieline:'Вырубка короба',other:'Дополнительные материалы'};
+export const MARKING_SECTIONS={package_marks:'Маркировка упаковки',carton_marks:'Маркировка короба',material_marks:'Материал упаковки'};
+export const MARKING_CATEGORIES=['Знаки соответствия','Манипуляционные знаки','Экологические знаки','Предупредительные знаки','Другие знаки','Материал упаковки'];
 export const IMPORTER_PREFIX='Разработано в Японии. Изготовлено с использованием японских материалов по заказу и под контролем ООО «Азия Лайф». Официальные импортеры и уполномоченные производителем организации в РФ и странах Таможенного союза:';
 export const IMPORTERS=[
  {id:'asia-life',number:'1',name:'ООО «Азия Лайф»',text:'1 — ООО «Азия Лайф». 115516, Российская Федерация, г. Москва, Кавказский бульвар, дом 57, строение 2, помещение 319. Тел.: +7 (499) 963-31-35. Сайт: www.yokosun.ru'},
@@ -19,13 +21,13 @@ export const INFO_FIELDS=[
  ['official_name','Наименование товара по СГР'],['barcode','ШК'],['carton_barcode','ШК короба'],['units_per_pack','Вложимость в упаковку'],['packs_per_carton','Вложимость в короб'],['intended_use','Назначение'],['application','Способ применения'],['precautions','Меры предосторожности'],['storage_conditions','Условия хранения'],['composition','Состав'],['shelf_life','Срок годности'],['mass','Масса'],
 ];
 export const COMPETITOR_COLUMNS=[['brand','Бренд'],['url','Ссылка на товар'],['advantages','Конкурентные преимущества'],['packaging','Что пишут на упаковке'],['stores','Где продаются'],['price','Цена']];
-export const LAYOUT_SLOTS=['draft','final','pack_dieline','carton_dieline'];
+export const LAYOUT_SLOTS=['draft','final','mockups_3d','pack_dieline','carton_dieline'];
 export const VARIANT_CLEAR_FIELDS=['barcode','carton_barcode','article','carton_article','units_per_pack','packs_per_carton','pre_pack'];
 const cleanString=(v,max=5000)=>{if(typeof v!=='string'||v.length>max)throw new Error('Проверьте заполненные поля');return v;};
 const idList=v=>{if(v===undefined)return [];if(!Array.isArray(v)||v.length>100)throw new Error('Слишком много выбранных значений');return [...new Set(v.map(x=>{if(typeof x!=='string'||!/^[a-zA-Z0-9_-]{1,100}$/.test(x))throw new Error('Некорректное выбранное значение');return x;}))];};
 export function normaliseDetails(v={}){
  if(!v||typeof v!=='object'||Array.isArray(v))throw new Error('Некорректная информация по товару');
- const out={factory_ids:idList(v.factory_ids),importer_ids:idList(v.importer_ids),package_marks:idList(v.package_marks),carton_marks:idList(v.carton_marks),translations:{},competitors:[]};
+ const out={factory_ids:idList(v.factory_ids),importer_ids:idList(v.importer_ids),package_marks:idList(v.package_marks),carton_marks:idList(v.carton_marks),material_marks:idList(v.material_marks),translations:{},competitors:[]};
  if(out.importer_ids.some(id=>!IMPORTERS.some(x=>x.id===id)))throw new Error('Выберите импортера из списка');
  const translations=v.translations||{};if(typeof translations!=='object'||Array.isArray(translations))throw new Error('Некорректные переводы');
  for(const code of Object.keys(TRANSLATIONS)){const t=translations[code]||{};out.translations[code]={enabled:t.enabled===true,text:cleanString(t.text??'',30000)};}
