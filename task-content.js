@@ -1,4 +1,4 @@
-import { INFO_FIELDS, FILE_SLOTS, TRANSLATIONS } from './content.js?v=20261028-tasks1';
+import { INFO_FIELDS, FILE_SLOTS, TRANSLATIONS } from './content.js?v=20261028-taskcards1';
 export const TASK_ASSIGNEES=[['polina','Полина'],['marina','Марина'],['marsel','Марсель'],['lena','Лена'],['china','Китай'],['alena','Алёна']];
 export const TASK_STATUSES={open:'Новая',in_progress:'В работе',done:'Выполнена',cancelled:'Отменена'};
 export const TASK_TABS={concept:'Концепция',info:'Информация по товару',competitors:'Конкуренты',files:'Файлы'};
